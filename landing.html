@@ -1,0 +1,1415 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MeetNotes AI - Intelligent Meeting Notes & Summaries</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #1e40af;
+        --primary-light: #3b82f6;
+        --primary-dark: #1e3a8a;
+        --accent: #06b6d4;
+        --text-dark: #1f2937;
+        --text-light: #6b7280;
+        --bg-light: #f9fafb;
+        --bg-lighter: #f3f4f6;
+        --border: #e5e7eb;
+        --success: #10b981;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", sans-serif;
+        color: var(--text-dark);
+        line-height: 1.6;
+        background: #fff;
+      }
+
+      /* Navigation */
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1vh 2vw;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        animation: slideDown 0.5s ease-out;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.5vw;
+        font-size: clamp(1.2rem, 2vw, 1.5rem);
+        font-weight: 700;
+        color: var(--primary);
+        animation: logoGlow 2s ease-in-out infinite;
+      }
+
+      .logo-icon {
+        width: clamp(28px, 4vw, 36px);
+        height: clamp(28px, 4vw, 36px);
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        border-radius: 0.5vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: clamp(16px, 2vw, 20px);
+        animation: iconBounce 2s ease-in-out infinite;
+      }
+
+      nav ul {
+        display: flex;
+        gap: clamp(1rem, 2vw, 2rem);
+        list-style: none;
+        align-items: center;
+      }
+
+      nav a {
+        color: var(--text-dark);
+        text-decoration: none;
+        font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+        transition: all 0.3s ease;
+      }
+
+      nav a:hover {
+        color: var(--primary-light);
+        transform: translateY(-0.2vh);
+      }
+
+      .btn {
+        padding: clamp(0.5rem, 1vh, 0.8rem) clamp(1rem, 2vw, 1.5rem);
+        border-radius: 0.5vw;
+        border: none;
+        font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-light)
+        );
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-0.3vh) scale(1.05);
+        box-shadow: 0 1vh 2.5vw rgba(30, 64, 175, 0.3);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+      }
+
+      .btn-secondary:hover {
+        background: var(--primary);
+        color: white;
+      }
+
+      /* Hero Section */
+      .hero {
+        background: linear-gradient(
+          135deg,
+          rgba(30, 64, 175, 0.1),
+          rgba(6, 182, 212, 0.05)
+        );
+        padding: clamp(4rem, 8vh, 8rem) clamp(1rem, 2vw, 3rem);
+        text-align: center;
+        animation: heroGradientShift 8s ease-in-out infinite;
+      }
+
+      .hero-content {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .hero h1 {
+        font-size: clamp(2rem, 8vw, 4rem);
+        font-weight: 800;
+        margin-bottom: clamp(1rem, 2vh, 2rem);
+        line-height: 1.2;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: textReveal 1s ease-out;
+      }
+
+      .hero p {
+        font-size: clamp(0.95rem, 2.5vw, 1.3rem);
+        color: var(--text-light);
+        margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+        line-height: 1.8;
+        animation: fadeInUp 1s ease-out 0.2s both;
+      }
+
+      .hero-buttons {
+        display: flex;
+        gap: clamp(0.8rem, 2vw, 1.5rem);
+        justify-content: center;
+        margin-bottom: clamp(2rem, 4vh, 3rem);
+        flex-wrap: wrap;
+        animation: fadeInUp 1s ease-out 0.4s both;
+      }
+
+      .hero-buttons .btn {
+        padding: clamp(0.6rem, 1.5vh, 0.9rem) clamp(1.5rem, 3vw, 2.5rem);
+        font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+      }
+
+      .hero-image {
+        margin-top: clamp(2rem, 4vh, 3rem);
+        background: linear-gradient(
+          135deg,
+          rgba(30, 64, 175, 0.15),
+          rgba(6, 182, 212, 0.1)
+        );
+        border-radius: clamp(12px, 2vw, 20px);
+        padding: clamp(1.5rem, 3vw, 2.5rem);
+        max-height: 50vh;
+        overflow: hidden;
+        animation: fadeInUp 1s ease-out 0.6s both;
+      }
+
+      .hero-image-placeholder {
+        width: 100%;
+        height: 40vh;
+        background: linear-gradient(135deg, #dbeafe, #cffafe);
+        border-radius: clamp(10px, 1.5vw, 16px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(2rem, 8vw, 5rem);
+        color: rgba(30, 64, 175, 0.2);
+        animation: imagePulse 3s ease-in-out infinite;
+      }
+
+      /* Features Section */
+      .features {
+        padding: clamp(4rem, 8vh, 8rem) clamp(1rem, 2vw, 3rem);
+        background: var(--bg-light);
+      }
+
+      .section-title {
+        text-align: center;
+        margin-bottom: clamp(2rem, 4vh, 3rem);
+        animation: fadeIn 1s ease-out;
+      }
+
+      .section-title h2 {
+        font-size: clamp(1.8rem, 5vw, 2.8rem);
+        margin-bottom: clamp(0.8rem, 1.5vh, 1.2rem);
+        color: var(--text-dark);
+      }
+
+      .section-title p {
+        font-size: clamp(0.95rem, 2vw, 1.1rem);
+        color: var(--text-light);
+        max-width: 80vw;
+        margin: 0 auto;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(clamp(280px, 30vw, 350px), 1fr)
+        );
+        gap: clamp(1.5rem, 3vw, 2.5rem);
+        max-width: 95vw;
+        margin: 0 auto;
+      }
+
+      .feature-card {
+        background: white;
+        padding: clamp(1.5rem, 3vw, 2.5rem);
+        border-radius: clamp(10px, 1.5vw, 16px);
+        border: 1px solid var(--border);
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .feature-card:hover {
+        transform: translateY(-1vh) scale(1.05);
+        box-shadow: 0 1.5vh 4vw rgba(30, 64, 175, 0.15);
+        border-color: var(--primary-light);
+      }
+
+      .feature-icon {
+        width: clamp(48px, 8vw, 64px);
+        height: clamp(48px, 8vw, 64px);
+        background: linear-gradient(
+          135deg,
+          rgba(30, 64, 175, 0.2),
+          rgba(6, 182, 212, 0.2)
+        );
+        border-radius: clamp(10px, 1.5vw, 16px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        margin-bottom: clamp(0.8rem, 1.5vh, 1.2rem);
+        animation: iconRotate 4s ease-in-out infinite;
+      }
+
+      .feature-card h3 {
+        font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+        margin-bottom: clamp(0.6rem, 1.2vh, 1rem);
+        color: var(--text-dark);
+      }
+
+      .feature-card p {
+        color: var(--text-light);
+        font-size: clamp(0.85rem, 1.5vw, 1rem);
+      }
+
+      /* How It Works */
+      .how-it-works {
+        padding: clamp(4rem, 8vh, 8rem) clamp(1rem, 2vw, 3rem);
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(clamp(220px, 25vw, 280px), 1fr)
+        );
+        gap: clamp(1.5rem, 3vw, 2.5rem);
+        max-width: 95vw;
+        margin: 0 auto;
+        margin-top: clamp(2rem, 4vh, 3rem);
+      }
+
+      .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        animation: slideUp 0.8s ease-out both;
+      }
+
+      .step:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .step:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      .step-number {
+        width: clamp(52px, 10vw, 72px);
+        height: clamp(52px, 10vw, 72px);
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+        font-weight: 700;
+        margin-bottom: clamp(0.8rem, 1.5vh, 1.2rem);
+        animation: numberPulse 2s ease-in-out infinite;
+      }
+
+      .step h3 {
+        font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+        margin-bottom: clamp(0.6rem, 1.2vh, 1rem);
+        color: var(--text-dark);
+      }
+
+      .step p {
+        color: var(--text-light);
+        font-size: clamp(0.85rem, 1.5vw, 1rem);
+      }
+
+      /* Benefits Section */
+      .benefits {
+        padding: clamp(4rem, 8vh, 8rem) clamp(1rem, 2vw, 3rem);
+        background: var(--bg-light);
+      }
+
+      .benefits-container {
+        max-width: 95vw;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(2rem, 4vw, 5rem);
+        align-items: center;
+      }
+
+      .benefits-content h2 {
+        font-size: clamp(2rem, 4.5vw, 2.8rem);
+        margin-bottom: clamp(1rem, 2vh, 1.8rem);
+      }
+
+      .benefit-list {
+        list-style: none;
+      }
+
+      .benefit-item {
+        display: flex;
+        gap: clamp(0.8rem, 1.5vw, 1.2rem);
+        margin-bottom: clamp(1rem, 2vh, 1.5rem);
+        padding-bottom: clamp(1rem, 2vh, 1.5rem);
+        border-bottom: 1px solid var(--border);
+        animation: slideRight 0.8s ease-out both;
+      }
+
+      .benefit-item:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+
+      .benefit-item:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+
+      .benefit-item:nth-child(4) {
+        animation-delay: 0.3s;
+      }
+
+      .benefit-item:last-child {
+        border-bottom: none;
+      }
+
+      .benefit-check {
+        flex-shrink: 0;
+        width: clamp(24px, 4vw, 32px);
+        height: clamp(24px, 4vw, 32px);
+        background: var(--success);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+        animation: checkmark 0.5s ease-out;
+      }
+
+      .benefit-text h4 {
+        font-size: clamp(0.95rem, 2vw, 1.2rem);
+        margin-bottom: clamp(0.2rem, 0.5vh, 0.4rem);
+      }
+
+      .benefit-text p {
+        color: var(--text-light);
+        font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+      }
+
+      .benefits-image {
+        background: linear-gradient(
+          135deg,
+          rgba(30, 64, 175, 0.15),
+          rgba(6, 182, 212, 0.1)
+        );
+        border-radius: clamp(12px, 2vw, 20px);
+        padding: clamp(1.5rem, 3vw, 2.5rem);
+        height: 40vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(2rem, 8vw, 4rem);
+        color: rgba(30, 64, 175, 0.2);
+        animation: floatAnimation 4s ease-in-out infinite;
+      }
+
+      /* Pricing Section */
+      .pricing {
+        padding: clamp(4rem, 8vh, 8rem) clamp(1rem, 2vw, 3rem);
+      }
+
+      .pricing-cards {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(clamp(280px, 28vw, 340px), 1fr)
+        );
+        gap: clamp(1.5rem, 3vw, 2.5rem);
+        max-width: 95vw;
+        margin: 0 auto;
+        margin-top: clamp(2rem, 4vh, 3rem);
+      }
+
+      .pricing-card {
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: clamp(10px, 1.5vw, 16px);
+        padding: clamp(1.8rem, 3.5vw, 3rem);
+        text-align: center;
+        transition: all 0.4s ease;
+        position: relative;
+      }
+
+      .pricing-card.featured {
+        border-color: var(--primary);
+        transform: scale(1.05);
+        box-shadow: 0 2vh 5vw rgba(30, 64, 175, 0.2);
+        animation: priceCardGlow 2s ease-in-out infinite;
+      }
+
+      .pricing-card.featured::before {
+        content: "POPULAR";
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .pricing-name {
+        font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+        font-weight: 700;
+        margin-bottom: clamp(0.8rem, 1.5vh, 1.2rem);
+        color: var(--text-dark);
+      }
+
+      .pricing-price {
+        font-size: clamp(2.2rem, 6vw, 3.5rem);
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: clamp(0.4rem, 0.8vh, 0.6rem);
+      }
+
+      .pricing-period {
+        color: var(--text-light);
+        margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+        font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+      }
+
+      .pricing-features {
+        list-style: none;
+        margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+        text-align: left;
+      }
+
+      .pricing-features li {
+        padding: clamp(0.6rem, 1.2vh, 1rem) 0;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-light);
+        font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+      }
+
+      .pricing-features li:before {
+        content: "✓ ";
+        color: var(--success);
+        font-weight: 700;
+        margin-right: 0.5rem;
+      }
+
+      .pricing-card .btn {
+        width: 100%;
+      }
+
+      /* Testimonials */
+      .testimonials {
+        padding: clamp(4rem, 8vh, 8rem) clamp(1rem, 2vw, 3rem);
+        background: var(--bg-light);
+      }
+
+      .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(clamp(280px, 28vw, 340px), 1fr)
+        );
+        gap: clamp(1.5rem, 3vw, 2.5rem);
+        max-width: 95vw;
+        margin: 0 auto;
+        margin-top: clamp(2rem, 4vh, 3rem);
+      }
+
+      .testimonial {
+        background: white;
+        padding: clamp(1.5rem, 3vw, 2.5rem);
+        border-radius: clamp(10px, 1.5vw, 16px);
+        border: 1px solid var(--border);
+        animation: fadeInUp 0.8s ease-out both;
+      }
+
+      .testimonial:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .testimonial:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      .stars {
+        color: #fbbf24;
+        font-size: clamp(0.9rem, 2vw, 1.2rem);
+        margin-bottom: clamp(0.8rem, 1.5vh, 1.2rem);
+      }
+
+      .testimonial-text {
+        color: var(--text-dark);
+        margin-bottom: clamp(1rem, 2vh, 1.5rem);
+        font-size: clamp(0.85rem, 1.5vw, 1rem);
+        line-height: 1.8;
+      }
+
+      .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: clamp(0.6rem, 1.2vw, 1rem);
+      }
+
+      .author-avatar {
+        width: clamp(40px, 8vw, 56px);
+        height: clamp(40px, 8vw, 56px);
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: clamp(1rem, 2vw, 1.3rem);
+        animation: avatarPulse 2s ease-in-out infinite;
+      }
+
+      .author-info h4 {
+        font-size: clamp(0.85rem, 1.8vw, 1rem);
+        margin-bottom: clamp(0.1rem, 0.3vh, 0.2rem);
+      }
+
+      .author-info p {
+        color: var(--text-light);
+        font-size: clamp(0.75rem, 1.3vw, 0.85rem);
+      }
+
+      /* FAQ Section */
+      .faq {
+        padding: clamp(4rem, 8vh, 8rem) clamp(1rem, 2vw, 3rem);
+      }
+
+      .faq-container {
+        max-width: 90vw;
+        margin: 0 auto;
+        margin-top: clamp(2rem, 4vh, 3rem);
+      }
+
+      .faq-item {
+        margin-bottom: clamp(1rem, 2vh, 1.5rem);
+        border: 1px solid var(--border);
+        border-radius: clamp(6px, 1vw, 10px);
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out both;
+      }
+
+      .faq-question {
+        background: var(--bg-lighter);
+        padding: clamp(1rem, 2vh, 1.8rem) clamp(1rem, 2vw, 1.5rem);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+        transition: all 0.3s ease;
+      }
+
+      .faq-question:hover {
+        background: var(--border);
+        transform: translateX(0.5vw);
+      }
+
+      .faq-icon {
+        font-size: 1.2rem;
+        transition: transform 0.3s;
+      }
+
+      .faq-item.active .faq-icon {
+        transform: rotate(180deg);
+      }
+
+      .faq-answer {
+        display: none;
+        padding: clamp(1rem, 2vh, 1.8rem) clamp(1rem, 2vw, 1.5rem);
+        color: var(--text-light);
+        background: white;
+        font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+      }
+
+      .faq-item.active .faq-answer {
+        display: block;
+      }
+
+      /* CTA Section */
+      .cta {
+        padding: clamp(4rem, 8vh, 8rem) clamp(1rem, 2vw, 3rem);
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-dark)
+        );
+        color: white;
+        text-align: center;
+        animation: ctaGradient 6s ease-in-out infinite;
+      }
+
+      .cta h2 {
+        font-size: clamp(1.8rem, 5vw, 2.8rem);
+        margin-bottom: clamp(0.8rem, 1.5vh, 1.2rem);
+      }
+
+      .cta p {
+        font-size: clamp(0.95rem, 2.5vw, 1.2rem);
+        margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+        opacity: 0.9;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--bg-lighter);
+        border-top: 1px solid var(--border);
+        padding: clamp(2rem, 4vh, 3rem) clamp(1rem, 2vw, 3rem);
+      }
+
+      .footer-content {
+        max-width: 95vw;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(clamp(160px, 20vw, 240px), 1fr)
+        );
+        gap: clamp(1.5rem, 3vw, 2.5rem);
+        margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+      }
+
+      .footer-section h3 {
+        font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+        font-weight: 700;
+        margin-bottom: clamp(0.8rem, 1.5vh, 1.2rem);
+      }
+
+      .footer-section ul {
+        list-style: none;
+      }
+
+      .footer-section a {
+        color: var(--text-light);
+        text-decoration: none;
+        font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+        line-height: 1.8;
+        transition: all 0.3s ease;
+      }
+
+      .footer-section a:hover {
+        color: var(--primary);
+        transform: translateX(0.3vw);
+      }
+
+      .footer-bottom {
+        border-top: 1px solid var(--border);
+        padding-top: clamp(1.5rem, 3vh, 2.5rem);
+        text-align: center;
+        color: var(--text-light);
+        font-size: clamp(0.8rem, 1.3vw, 0.9rem);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .benefits-container {
+          grid-template-columns: 1fr;
+        }
+
+        .pricing-card.featured {
+          transform: scale(1);
+        }
+
+        .hero-buttons {
+          flex-direction: column;
+        }
+
+        .hero-buttons .btn {
+          width: 100%;
+        }
+      }
+
+      /* Animations */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(3vh);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-100%);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(3vh);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideRight {
+        from {
+          opacity: 0;
+          transform: translateX(-2vw);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes textReveal {
+        from {
+          opacity: 0;
+          transform: translateY(2vh) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes logoGlow {
+        0%,
+        100% {
+          text-shadow: 0 0 0.5vw rgba(30, 64, 175, 0);
+        }
+        50% {
+          text-shadow: 0 0 1vw rgba(30, 64, 175, 0.5);
+        }
+      }
+
+      @keyframes iconBounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-0.5vh);
+        }
+      }
+
+      @keyframes iconRotate {
+        0%,
+        100% {
+          transform: rotate(0deg);
+        }
+        50% {
+          transform: rotate(5deg);
+        }
+      }
+
+      @keyframes imagePulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.02);
+          opacity: 0.95;
+        }
+      }
+
+      @keyframes floatAnimation {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-1vh);
+        }
+      }
+
+      @keyframes numberPulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.15);
+        }
+      }
+
+      @keyframes heroGradientShift {
+        0%,
+        100% {
+          background: linear-gradient(
+            135deg,
+            rgba(30, 64, 175, 0.1),
+            rgba(6, 182, 212, 0.05)
+          );
+        }
+        50% {
+          background: linear-gradient(
+            135deg,
+            rgba(30, 64, 175, 0.15),
+            rgba(6, 182, 212, 0.1)
+          );
+        }
+      }
+
+      @keyframes priceCardGlow {
+        0%,
+        100% {
+          box-shadow: 0 2vh 5vw rgba(30, 64, 175, 0.15);
+        }
+        50% {
+          box-shadow: 0 2vh 6vw rgba(30, 64, 175, 0.25);
+        }
+      }
+
+      @keyframes checkmark {
+        from {
+          transform: scale(0) rotate(-45deg);
+        }
+        to {
+          transform: scale(1) rotate(0);
+        }
+      }
+
+      @keyframes avatarPulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        }
+        50% {
+          box-shadow: 0 0 0 0.3vw rgba(16, 185, 129, 0);
+        }
+      }
+
+      @keyframes ctaGradient {
+        0%,
+        100% {
+          background: linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+          );
+        }
+        50% {
+          background: linear-gradient(
+            135deg,
+            var(--primary-dark),
+            var(--accent)
+          );
+        }
+      }
+
+      .feature-card:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+
+      .feature-card:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .feature-card:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+
+      .pricing-card:nth-child(1) {
+        animation: fadeInUp 0.6s ease-out 0.1s both;
+      }
+
+      .pricing-card:nth-child(2) {
+        animation: fadeInUp 0.6s ease-out 0.2s both;
+      }
+
+      .pricing-card:nth-child(3) {
+        animation: fadeInUp 0.6s ease-out 0.3s both;
+      }
+
+      .faq-item:nth-child(1) {
+        animation-delay: 0s;
+      }
+
+      .faq-item:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+
+      .faq-item:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+
+      .faq-item:nth-child(4) {
+        animation-delay: 0.3s;
+      }
+
+      .faq-item:nth-child(5) {
+        animation-delay: 0.4s;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav>
+      <div class="logo">
+        <div class="logo-icon">📝</div>
+        <span>MeetNotes AI</span>
+      </div>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#" class="btn btn-secondary">Sign In</a></li>
+      </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Never Miss a Single Word</h1>
+        <p>
+          Let AI capture, summarize, and organize your meeting notes
+          automatically. Focus on the discussion, not the note-taking.
+        </p>
+        <div class="hero-buttons">
+          <button class="btn btn-primary">Start Free Trial</button>
+          <button class="btn btn-secondary">Watch Demo</button>
+        </div>
+        <div class="hero-image">
+          <div class="hero-image-placeholder">🎥</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+      <div class="section-title">
+        <h2>Powerful Features</h2>
+        <p>Everything you need to transform your meeting experience</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎙️</div>
+          <h3>Real-time Transcription</h3>
+          <p>
+            Advanced AI transcribes your meeting with 99.9% accuracy across 60+
+            languages in real-time.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Automatic Summarization</h3>
+          <p>
+            Get intelligent summaries highlighting key decisions, action items,
+            and discussion points instantly.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Smart Search</h3>
+          <p>
+            Instantly search through all your meetings with powerful filters and
+            AI-powered semantic search.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">👥</div>
+          <h3>Speaker Identification</h3>
+          <p>
+            Automatically identify and attribute statements to the correct
+            speaker with speaker diarization.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>Action Item Tracking</h3>
+          <p>
+            Automatically extract action items with owners and due dates. Never
+            let a task slip again.
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔗</div>
+          <h3>Integrations</h3>
+          <p>
+            Seamlessly connects with Zoom, Teams, Google Meet, Slack, Jira, and
+            100+ other tools.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how">
+      <div class="section-title">
+        <h2>How It Works</h2>
+        <p>Get started in 3 simple steps</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <h3>Start Recording</h3>
+          <p>
+            Invite the MeetNotes AI bot to your meeting or simply start
+            recording with our app. Works with any meeting platform.
+          </p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <h3>AI Processes</h3>
+          <p>
+            Our advanced AI processes the meeting in real-time, transcribing
+            audio and identifying key moments automatically.
+          </p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <h3>Share & Act</h3>
+          <p>
+            Get organized notes, summaries, and action items. Share with your
+            team and integrate with your workflow.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits">
+      <div class="section-title">
+        <h2>Why Teams Love MeetNotes</h2>
+        <p>Transform how your team collaborates and stays organized</p>
+      </div>
+      <div class="benefits-container">
+        <div class="benefits-content">
+          <h2>Save Time & Stay Focused</h2>
+          <ul class="benefit-list">
+            <li class="benefit-item">
+              <div class="benefit-check">✓</div>
+              <div class="benefit-text">
+                <h4>6+ Hours Saved Per Week</h4>
+                <p>
+                  Stop manually transcribing and organizing notes. Let AI handle
+                  it for you.
+                </p>
+              </div>
+            </li>
+            <li class="benefit-item">
+              <div class="benefit-check">✓</div>
+              <div class="benefit-text">
+                <h4>100% Accuracy Retention</h4>
+                <p>
+                  Never miss important details. Every word is captured and
+                  searchable.
+                </p>
+              </div>
+            </li>
+            <li class="benefit-item">
+              <div class="benefit-check">✓</div>
+              <div class="benefit-text">
+                <h4>Better Team Alignment</h4>
+                <p>
+                  Everyone gets the same notes. Reduce miscommunication and
+                  confusion.
+                </p>
+              </div>
+            </li>
+            <li class="benefit-item">
+              <div class="benefit-check">✓</div>
+              <div class="benefit-text">
+                <h4>Actionable Insights</h4>
+                <p>
+                  Automatically track who said what and what needs to be done.
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="benefits-image">📊</div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+      <div class="section-title">
+        <h2>Simple, Transparent Pricing</h2>
+        <p>Choose the perfect plan for your needs</p>
+      </div>
+      <div class="pricing-cards">
+        <div class="pricing-card">
+          <div class="pricing-name">Starter</div>
+          <div class="pricing-price">$29</div>
+          <div class="pricing-period">per month, billed annually</div>
+          <ul class="pricing-features">
+            <li>Up to 20 hours of recordings</li>
+            <li>Automatic transcription</li>
+            <li>Basic summaries</li>
+            <li>1 user account</li>
+            <li>Email support</li>
+          </ul>
+          <button class="btn btn-secondary">Get Started</button>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-name">Professional</div>
+          <div class="pricing-price">$79</div>
+          <div class="pricing-period">per month, billed annually</div>
+          <ul class="pricing-features">
+            <li>Unlimited recordings</li>
+            <li>Advanced AI summaries</li>
+            <li>Action item tracking</li>
+            <li>Up to 5 users</li>
+            <li>Team integrations</li>
+            <li>Priority support</li>
+          </ul>
+          <button class="btn btn-primary">Start Free Trial</button>
+        </div>
+        <div class="pricing-card">
+          <div class="pricing-name">Enterprise</div>
+          <div class="pricing-price">Custom</div>
+          <div class="pricing-period">contact us for pricing</div>
+          <ul class="pricing-features">
+            <li>Everything in Professional</li>
+            <li>Unlimited users</li>
+            <li>Custom integrations</li>
+            <li>Advanced security</li>
+            <li>Dedicated support</li>
+            <li>SLA guarantee</li>
+          </ul>
+          <button class="btn btn-secondary">Contact Sales</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+      <div class="section-title">
+        <h2>Loved by Teams Everywhere</h2>
+        <p>See what our customers have to say</p>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">
+            "MeetNotes AI has been a game-changer for our remote team. We save
+            so much time not having to manually transcribe every meeting."
+          </p>
+          <div class="testimonial-author">
+            <div class="author-avatar">SJ</div>
+            <div class="author-info">
+              <h4>Sarah Johnson</h4>
+              <p>Product Manager, TechCorp</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">
+            "The accuracy is incredible. I finally trust that my notes are
+            complete and correct. The integrations with Slack make sharing a
+            breeze."
+          </p>
+          <div class="testimonial-author">
+            <div class="author-avatar">MK</div>
+            <div class="author-info">
+              <h4>Marcus Kim</h4>
+              <p>Engineering Lead, DataFlow</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="stars">★★★★★</div>
+          <p class="testimonial-text">
+            "Our team is more aligned than ever. The automatic action item
+            tracking means nothing falls through the cracks anymore."
+          </p>
+          <div class="testimonial-author">
+            <div class="author-avatar">EC</div>
+            <div class="author-info">
+              <h4>Emily Chen</h4>
+              <p>CEO, CreativeStudio</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq" id="faq">
+      <div class="section-title">
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know about MeetNotes AI</p>
+      </div>
+      <div class="faq-container">
+        <div class="faq-item active">
+          <div class="faq-question">
+            <span>Is my meeting data secure and private?</span>
+            <span class="faq-icon">▼</span>
+          </div>
+          <div class="faq-answer">
+            Yes, we take security very seriously. All meetings are encrypted in
+            transit and at rest with enterprise-grade security. We comply with
+            GDPR, HIPAA, and SOC 2 Type II standards. Your data is never used to
+            train our AI models.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>What meeting platforms does MeetNotes support?</span>
+            <span class="faq-icon">▼</span>
+          </div>
+          <div class="faq-answer">
+            We work with all major platforms including Zoom, Microsoft Teams,
+            Google Meet, Webex, Slack Huddles, and many more. You can also
+            upload audio files for transcription.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How accurate is the transcription?</span>
+            <span class="faq-icon">▼</span>
+          </div>
+          <div class="faq-answer">
+            Our AI achieves 99.9% accuracy in English and 95%+ accuracy across
+            other languages. It handles multiple speakers, accents, and
+            technical terminology with ease.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Can I customize the summary format?</span>
+            <span class="faq-icon">▼</span>
+          </div>
+          <div class="faq-answer">
+            Yes! You can customize summary templates, tone, length, and focus
+            areas. You can also use our API to build custom integrations.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Do you offer a free trial?</span>
+            <span class="faq-icon">▼</span>
+          </div>
+          <div class="faq-answer">
+            Absolutely! We offer a 14-day free trial of our Professional plan
+            with full access to all features. No credit card required to get
+            started.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+      <h2>Ready to Transform Your Meetings?</h2>
+      <p>Join thousands of teams already saving time with MeetNotes AI</p>
+      <button class="btn btn-primary">Start Your Free Trial Today</button>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Product</h3>
+          <ul>
+            <li><a href="#">Features</a></li>
+            <li><a href="#">Pricing</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">Roadmap</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Resources</h3>
+          <ul>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">API</a></li>
+            <li><a href="#">Community</a></li>
+            <li><a href="#">Support</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+            <li><a href="#">Status</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 MeetNotes AI. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      // FAQ Accordion
+      document.querySelectorAll(".faq-question").forEach((question) => {
+        question.addEventListener("click", () => {
+          const item = question.parentElement;
+          item.classList.toggle("active");
+        });
+      });
+
+      // Smooth scroll
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth" });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
